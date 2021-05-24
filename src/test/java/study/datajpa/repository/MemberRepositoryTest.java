@@ -3,6 +3,10 @@ package study.datajpa.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -15,13 +19,16 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
 @Rollback(false)
 public class MemberRepositoryTest {
-    @Autowired MemberRepository memberRepository;
-    @Autowired TeamRepository teamRepository;
+    @Autowired
+    MemberRepository memberRepository;
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     void testMember() {
@@ -36,8 +43,8 @@ public class MemberRepositoryTest {
         assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
 
         // jupiter
-        assertEquals(findMember.getId(),member.getId());
-        assertEquals(findMember.getUsername(),member.getUsername());
+        assertEquals(findMember.getId(), member.getId());
+        assertEquals(findMember.getUsername(), member.getUsername());
         assertEquals(findMember, member);
     }
 
@@ -73,7 +80,7 @@ public class MemberRepositoryTest {
     @Test
     void findByUsernameAndAgeGreaterThen() {
         Member m1 = new Member("aaa", 10);
-        Member m2 = new Member("aaa",  20);
+        Member m2 = new Member("aaa", 20);
         memberRepository.save(m1);
         memberRepository.save(m2);
 
@@ -85,7 +92,7 @@ public class MemberRepositoryTest {
     @Test
     void testQuery() {
         Member m1 = new Member("AAA", 10);
-        Member m2 = new Member("BBB",  20);
+        Member m2 = new Member("BBB", 20);
         memberRepository.save(m1);
         memberRepository.save(m2);
 
@@ -96,7 +103,7 @@ public class MemberRepositoryTest {
     @Test
     void findUsernameList() {
         Member m1 = new Member("AAA", 10);
-        Member m2 = new Member("BBB",  20);
+        Member m2 = new Member("BBB", 20);
         memberRepository.save(m1);
         memberRepository.save(m2);
 
@@ -121,7 +128,7 @@ public class MemberRepositoryTest {
     @Test
     void findByNames() {
         Member m1 = new Member("AAA", 10);
-        Member m2 = new Member("BBB",  20);
+        Member m2 = new Member("BBB", 20);
         memberRepository.save(m1);
         memberRepository.save(m2);
 
@@ -132,12 +139,40 @@ public class MemberRepositoryTest {
     @Test
     void returnType() {
         Member m1 = new Member("AAA", 10);
-        Member m2 = new Member("AAA",  20);
+        Member m2 = new Member("AAA", 20);
         memberRepository.save(m1);
         memberRepository.save(m2);
 
         Optional<Member> findMember = memberRepository.findOptionalByUsername("AAA");
         System.out.println(findMember);
+    }
+
+    @Test
+    void paging() {
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        Page<Member> page = memberRepository.findByAge(age, pageRequest);
+        Page<MemberDto> toMap = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+//        Slice<Member> page = memberRepository.findByAge(age, pageRequest);
+
+        List<Member> content = page.getContent();
+
+        content.forEach(m -> System.out.println("member = " + m));
+
+        assertEquals(content.size(), 3);
+        assertEquals(page.getTotalElements(), 5);
+        assertEquals(page.getNumber(), 0);
+        assertEquals(page.getTotalPages(), 2);
+        assertTrue(page.isFirst());
+        assertTrue(page.hasNext());
+
     }
 
 }

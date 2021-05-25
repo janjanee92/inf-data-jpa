@@ -254,4 +254,9 @@ public class MemberRepositoryTest {
 
     }
 
+    @Test
+    void callCustom() {
+        //  given
+        List<Member> result = memberRepository.findMemberCustom();
+    }
 }

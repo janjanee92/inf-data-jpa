@@ -93,10 +93,6 @@ class MemberTest {
         Member findMember = memberRepository.findById(member.getId()).orElseThrow();
 
         //  then
-        System.out.println("findMember.createdDate = " + findMember.getCreatedDate());
-        System.out.println("findMember.lastModifiedDate = " + findMember.getLastModifiedDate());
-        System.out.println("findMember.createdBy = " + findMember.getCreatedBy());
-        System.out.println("findMember.lastModifiedBy = " + findMember.getLastModifiedBy());
 
         Team team = new Team("teamA");
         teamRepository.save(team);  //  @PrePersist
@@ -108,8 +104,6 @@ class MemberTest {
         em.clear();
 
         Team findTeam = teamRepository.findById(team.getId()).orElseThrow();
-        System.out.println("team.createdDate = " + findTeam.getCreatedDate());
-        System.out.println("team.lastModifiedDate = " + findTeam.getLastModifiedDate());
 
     }
 }

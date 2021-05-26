@@ -20,7 +20,7 @@ public class MemberController {
 
     @GetMapping("/members/{id}")
     public String findMember(@PathVariable("id") Long id) {
-        Member member = memberRepository.findById(id).get();
+        Member member = memberRepository.findById(id).orElseThrow();
         return member.getUsername();
     }
 
@@ -35,7 +35,7 @@ public class MemberController {
                 .map(MemberDto::new);
     }
 
-    @PostConstruct
+//    @PostConstruct
     private void init() {
         for (int i = 0; i < 100; i++) {
             memberRepository.save(new Member("user" + i, i));

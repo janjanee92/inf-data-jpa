@@ -20,6 +20,10 @@ class ItemRepositoryTest {
     @Test
     void save() {
         Item item = new Item("1");
-        itemRepository.save(item);
+        Item savedItem = itemRepository.save(item);
+
+        String id = savedItem.getId();
+        assertEquals(id, 1);
     }
+
 }
